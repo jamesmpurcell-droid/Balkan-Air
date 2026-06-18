@@ -7,6 +7,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1912951C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalkanAir.SmokeTests", "tests\BalkanAir.SmokeTests\BalkanAir.SmokeTests.csproj", "{BC89CA42-174F-4D92-95E7-A919D28CB385}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5007CE1A-4D36-4CDC-BE4E-BDB1F1AF6700}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalkanAir.Common", "src\BalkanAir.Common\BalkanAir.Common.csproj", "{DA3D41F9-CD58-4281-AAD6-0DAC45C244BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalkanAir.Domain", "src\BalkanAir.Domain\BalkanAir.Domain.csproj", "{BF772540-F4B9-47CF-B981-004681674084}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +26,18 @@ Global
 		{BC89CA42-174F-4D92-95E7-A919D28CB385}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC89CA42-174F-4D92-95E7-A919D28CB385}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC89CA42-174F-4D92-95E7-A919D28CB385}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA3D41F9-CD58-4281-AAD6-0DAC45C244BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA3D41F9-CD58-4281-AAD6-0DAC45C244BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA3D41F9-CD58-4281-AAD6-0DAC45C244BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA3D41F9-CD58-4281-AAD6-0DAC45C244BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF772540-F4B9-47CF-B981-004681674084}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF772540-F4B9-47CF-B981-004681674084}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF772540-F4B9-47CF-B981-004681674084}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF772540-F4B9-47CF-B981-004681674084}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BC89CA42-174F-4D92-95E7-A919D28CB385} = {1912951C-6949-475E-8CE1-1B151F6787C7}
+		{DA3D41F9-CD58-4281-AAD6-0DAC45C244BD} = {5007CE1A-4D36-4CDC-BE4E-BDB1F1AF6700}
+		{BF772540-F4B9-47CF-B981-004681674084} = {5007CE1A-4D36-4CDC-BE4E-BDB1F1AF6700}
 	EndGlobalSection
 EndGlobal
