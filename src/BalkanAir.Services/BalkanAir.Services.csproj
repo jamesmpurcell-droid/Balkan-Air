@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\BalkanAir.Common\BalkanAir.Common.csproj" />
+    <ProjectReference Include="..\BalkanAir.Data\BalkanAir.Data.csproj" />
+    <ProjectReference Include="..\BalkanAir.Domain\BalkanAir.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
