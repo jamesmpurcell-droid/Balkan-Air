@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BalkanAir.Data\BalkanAir.Data.csproj" />
+    <ProjectReference Include="..\BalkanAir.Services\BalkanAir.Services.csproj" />
+  </ItemGroup>
+
+</Project>
