@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 public sealed class UsersService(BalkanAirDbContext db) : IUsersService
 {
-    public async Task<string> AddAsync(User entity)
+    public async Task<string> AddAsync(ApplicationUser entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
         db.Users.Add(entity);
@@ -15,21 +15,21 @@ public sealed class UsersService(BalkanAirDbContext db) : IUsersService
         return entity.Id;
     }
 
-    public async Task<User?> GetByIdAsync(string id)
+    public async Task<ApplicationUser?> GetByIdAsync(string id)
     {
         ArgumentException.ThrowIfNullOrEmpty(id);
         return await db.Users.FindAsync(id);
     }
 
-    public async Task<User?> GetByEmailAsync(string email)
+    public async Task<ApplicationUser?> GetByEmailAsync(string email)
     {
         ArgumentException.ThrowIfNullOrEmpty(email);
         return await db.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public IQueryable<User> GetAll() => db.Users.AsQueryable();
+    public IQueryable<ApplicationUser> GetAll() => db.Users.AsQueryable();
 
-    public async Task<User?> UpdateAsync(string id, Action<User> applyUpdates)
+    public async Task<ApplicationUser?> UpdateAsync(string id, Action<ApplicationUser> applyUpdates)
     {
         ArgumentException.ThrowIfNullOrEmpty(id);
         ArgumentNullException.ThrowIfNull(applyUpdates);
@@ -42,7 +42,7 @@ public sealed class UsersService(BalkanAirDbContext db) : IUsersService
         return user;
     }
 
-    public async Task<User?> SoftDeleteAsync(string id)
+    public async Task<ApplicationUser?> SoftDeleteAsync(string id)
     {
         ArgumentException.ThrowIfNullOrEmpty(id);
         var user = await db.Users.FindAsync(id);
@@ -62,7 +62,7 @@ public sealed class UsersService(BalkanAirDbContext db) : IUsersService
         var user = await db.Users.FindAsync(userId);
         if (user is not null)
         {
-            user.UserSettings.ProfilePicture = image;
+            user.ProfilePicture = image;
             await db.SaveChangesAsync();
         }
     }
@@ -73,7 +73,7 @@ public sealed class UsersService(BalkanAirDbContext db) : IUsersService
         var user = await db.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
         if (user is not null)
         {
-            user.UserSettings.LastLogin = dateTime;
+            user.LastLogin = dateTime;
             await db.SaveChangesAsync();
         }
     }
@@ -84,7 +84,7 @@ public sealed class UsersService(BalkanAirDbContext db) : IUsersService
         var user = await db.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
         if (user is not null)
         {
-            user.UserSettings.LastLogout = dateTime;
+            user.LastLogout = dateTime;
             await db.SaveChangesAsync();
         }
     }

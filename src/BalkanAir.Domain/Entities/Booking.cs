@@ -15,7 +15,7 @@ public class Booking
     public bool IsDeleted { get; set; }
 
     public required string UserId { get; set; }
-    public User? User { get; set; }
+    public ApplicationUser? User { get; set; }
 
     public int LegInstanceId { get; set; }
     public LegInstance? LegInstance { get; set; }
