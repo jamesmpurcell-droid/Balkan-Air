@@ -1,0 +1,35 @@
+@model IEnumerable<BalkanAir.Domain.Entities.Booking>
+@{ ViewData["Title"] = "Manage Bookings"; }
+
+<h2>Bookings Management</h2>
+<a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3">Back to Dashboard</a>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr><th>ID</th><th>Code</th><th>Date</th><th>User</th><th>Seat</th><th>Total</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(item.IsDeleted ? "table-danger" : "")">
+                    <td>@item.Id</td>
+                    <td><code>@item.ConfirmationCode</code></td>
+                    <td>@item.DateOfBooking.ToString("dd MMM yyyy")</td>
+                    <td>@item.UserId</td>
+                    <td>@item.Row@item.SeatNumber</td>
+                    <td>@item.TotalPrice.ToString("C")</td>
+                    <td>@item.Status</td>
+                    <td>
+                        @if (!item.IsDeleted)
+                        {
+                            <form asp-action="DeleteBooking" asp-route-id="@item.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">Delete</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

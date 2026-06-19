@@ -1,0 +1,86 @@
+@{
+    ViewData["Title"] = "Administration";
+}
+
+<h2>Administration Dashboard</h2>
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-2">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-primary">@ViewBag.AircraftCount</h3>
+                <p class="card-text">Aircraft</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-primary">@ViewBag.AirportCount</h3>
+                <p class="card-text">Airports</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-primary">@ViewBag.FlightCount</h3>
+                <p class="card-text">Flights</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-primary">@ViewBag.BookingCount</h3>
+                <p class="card-text">Bookings</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-primary">@ViewBag.NewsCount</h3>
+                <p class="card-text">News</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-primary">@ViewBag.UserCount</h3>
+                <p class="card-text">Users</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Manage</h4>
+<div class="row g-3">
+    @foreach (var (name, action) in new[] {
+        ("Aircraft", "Aircraft"), ("Airports", "Airports"), ("Flights", "Flights"),
+        ("Flight Legs", "FlightLegs"), ("Leg Instances", "LegInstances"),
+        ("Bookings", "Bookings"), ("News", "News"), ("Routes", "Routes"),
+        ("Categories", "Categories"), ("Countries", "Countries"),
+        ("Travel Classes", "TravelClasses"), ("Fares", "Fares"),
+        ("Seats", "Seats"), ("Manufacturers", "Manufacturers"), ("Users", "Users")
+    })
+    {
+        <div class="col-md-3">
+            <a asp-action="@action" class="btn btn-outline-primary w-100 mb-2">@name</a>
+        </div>
+    }
+</div>
+
+<hr class="my-4" />
+<form asp-action="SeedRoles" method="post" class="d-inline">
+    <button type="submit" class="btn btn-warning">Seed Roles</button>
+</form>

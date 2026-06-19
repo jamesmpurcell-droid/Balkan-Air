@@ -1,0 +1,43 @@
+@model IEnumerable<BalkanAir.Domain.Entities.Booking>
+@{
+    ViewData["Title"] = "My Bookings";
+}
+
+<h2>My Bookings</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You have no bookings yet. <a asp-action="Search">Search for flights</a>.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Confirmation</th>
+                    <th>Date</th>
+                    <th>Seat</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var booking in Model)
+                {
+                    <tr>
+                        <td><code>@booking.ConfirmationCode</code></td>
+                        <td>@booking.DateOfBooking.ToString("dd MMM yyyy")</td>
+                        <td>Row @booking.Row, Seat @booking.SeatNumber</td>
+                        <td>@booking.TotalPrice.ToString("C")</td>
+                        <td>
+                            <span class="badge @(booking.Status == BalkanAir.Domain.Enums.BookingStatus.Confirmed ? "bg-success" : "bg-secondary")">
+                                @booking.Status
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

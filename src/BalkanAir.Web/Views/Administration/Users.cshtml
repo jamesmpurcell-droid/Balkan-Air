@@ -1,0 +1,25 @@
+@model IEnumerable<BalkanAir.Domain.Entities.ApplicationUser>
+@{ ViewData["Title"] = "Manage Users"; }
+
+<h2>Users Management</h2>
+<a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3">Back to Dashboard</a>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr><th>ID</th><th>Email</th><th>Name</th><th>Created</th><th>Deleted</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(item.IsDeleted ? "table-danger" : "")">
+                    <td>@item.Id</td>
+                    <td>@item.Email</td>
+                    <td>@item.FirstName @item.LastName</td>
+                    <td>@item.CreatedOn.ToString("dd MMM yyyy")</td>
+                    <td>@item.IsDeleted</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
