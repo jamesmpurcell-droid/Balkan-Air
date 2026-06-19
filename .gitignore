@@ -1,0 +1,20 @@
+# .NET
+bin/
+obj/
+out/
+*.user
+.vs/
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# Build / test output
+[Tt]est[Rr]esults/
+*.trx
+coverage/
+*.coverage
+
+# Local env
+.env
+appsettings.*.local.json

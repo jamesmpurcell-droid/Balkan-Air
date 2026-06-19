@@ -1,0 +1,30 @@
+@model IEnumerable<BalkanAir.Domain.Entities.News>
+@{
+    ViewData["Title"] = "News";
+}
+
+<h2>Latest News</h2>
+<p class="text-muted">Stay informed about Balkan Air.</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No news articles yet. Connect a database to see live data.</div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Title</h5>
+                        <p class="card-text text-muted">@item.DateCreated.ToString("dd MMM yyyy")</p>
+                        <p class="card-text">@(item.Content.Length > 200 ? item.Content[..200] + "..." : item.Content)</p>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,13 @@
+@model BalkanAir.Domain.Entities.News
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<article>
+    <h2>@Model.Title</h2>
+    <p class="text-muted">Published: @Model.DateCreated.ToString("dd MMM yyyy")</p>
+    <hr />
+    <div>@Model.Content</div>
+</article>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Back to News</a>

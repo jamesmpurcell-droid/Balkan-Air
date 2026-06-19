@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold text-primary">Welcome to Balkan Air</h1>
+    <p class="lead">Your gateway to the Balkans and beyond. Book flights, explore destinations, and travel with confidence.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h3 class="card-title text-primary">Search Flights</h3>
+                <p class="card-text">Find the best fares and routes across our growing network of destinations.</p>
+                <a asp-controller="Flights" asp-action="Index" class="btn btn-primary">Browse Flights</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h3 class="card-title text-primary">Latest News</h3>
+                <p class="card-text">Stay up to date with new routes, fleet updates, and company announcements.</p>
+                <a asp-controller="News" asp-action="Index" class="btn btn-outline-primary">Read News</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h3 class="card-title text-primary">Our Fleet</h3>
+                <p class="card-text">Explore our modern aircraft fleet with multiple travel class options.</p>
+                <a asp-controller="Flights" asp-action="Index" class="btn btn-outline-primary">View Fleet</a>
+            </div>
+        </div>
+    </div>
+</div>
