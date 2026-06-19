@@ -1,4 +1,0 @@
-<Project>
-  <!-- Intentionally empty: stops the root Directory.Build.props (net8.0 settings)
-       from being inherited by the legacy .NET Framework projects. -->
-</Project>
