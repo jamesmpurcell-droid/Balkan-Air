@@ -1,0 +1,35 @@
+@model BalkanAir.Web.Models.Admin.AircraftFormViewModel
+@{ ViewData["Title"] = "Add Aircraft"; }
+
+<h2>Add Aircraft</h2>
+<a asp-action="Aircraft" class="btn btn-outline-secondary btn-sm mb-3">Back to Aircraft</a>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CreateAircraft" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="AircraftModel" class="form-label"></label>
+                <input asp-for="AircraftModel" class="form-control" placeholder="e.g. 737-800" />
+                <span asp-validation-for="AircraftModel" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ManufacturerId" class="form-label"></label>
+                <select asp-for="ManufacturerId" asp-items="@(ViewBag.Manufacturers as SelectList)" class="form-select">
+                    <option value="">-- Select Manufacturer --</option>
+                </select>
+                <span asp-validation-for="ManufacturerId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="TotalSeats" class="form-label"></label>
+                <input asp-for="TotalSeats" class="form-control" type="number" min="1" max="900" />
+                <span asp-validation-for="TotalSeats" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Aircraft</button>
+        </form>
+    </div>
+</div>

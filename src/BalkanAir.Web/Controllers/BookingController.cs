@@ -62,13 +62,27 @@ public class BookingController(
     [HttpGet]
     public async Task<IActionResult> Confirm(int legInstanceId)
     {
-        var flight = await legInstances.GetByIdAsync(legInstanceId);
+        var flight = await legInstances.GetAll()
+            .Where(l => l.Id == legInstanceId)
+            .Include(l => l.FlightLeg!)
+                .ThenInclude(fl => fl.Route!)
+                    .ThenInclude(r => r.Origin!)
+            .Include(l => l.FlightLeg!)
+                .ThenInclude(fl => fl.Route!)
+                    .ThenInclude(r => r.Destination!)
+            .FirstOrDefaultAsync();
+
         if (flight is null) return NotFound();
 
         ViewBag.Flight = flight;
         ViewBag.TravelClasses = new SelectList(
             await travelClasses.GetAll().Where(t => !t.IsDeleted).ToListAsync(),
             "Id", "Type");
+
+        var fare = flight.FlightLeg?.RouteId is int routeId
+            ? await fares.GetAll().FirstOrDefaultAsync(f => f.RouteId == routeId && !f.IsDeleted)
+            : null;
+        ViewBag.FarePrice = fare?.Price ?? flight.Price;
 
         return View(new BookingConfirmViewModel { LegInstanceId = legInstanceId, SeatNumber = "A" });
     }
@@ -115,7 +129,18 @@ public class BookingController(
     [HttpGet]
     public async Task<IActionResult> Confirmation(int id)
     {
-        var booking = await bookings.GetByIdAsync(id);
+        var booking = await bookings.GetAll()
+            .Where(b => b.Id == id)
+            .Include(b => b.LegInstance!)
+                .ThenInclude(l => l.FlightLeg!)
+                    .ThenInclude(fl => fl.Route!)
+                        .ThenInclude(r => r.Origin!)
+            .Include(b => b.LegInstance!)
+                .ThenInclude(l => l.FlightLeg!)
+                    .ThenInclude(fl => fl.Route!)
+                        .ThenInclude(r => r.Destination!)
+            .FirstOrDefaultAsync();
+
         if (booking is null) return NotFound();
         return View(booking);
     }
@@ -128,7 +153,14 @@ public class BookingController(
 
         var userBookings = await bookings.GetAll()
             .Where(b => b.UserId == user.Id && !b.IsDeleted)
-            .Include(b => b.LegInstance)
+            .Include(b => b.LegInstance!)
+                .ThenInclude(l => l.FlightLeg!)
+                    .ThenInclude(fl => fl.Route!)
+                        .ThenInclude(r => r.Origin!)
+            .Include(b => b.LegInstance!)
+                .ThenInclude(l => l.FlightLeg!)
+                    .ThenInclude(fl => fl.Route!)
+                        .ThenInclude(r => r.Destination!)
             .OrderByDescending(b => b.DateOfBooking)
             .ToListAsync();
 

@@ -16,7 +16,9 @@ else
             <thead class="table-dark">
                 <tr>
                     <th>Confirmation</th>
-                    <th>Date</th>
+                    <th>Route</th>
+                    <th>Departure</th>
+                    <th>Booked On</th>
                     <th>Seat</th>
                     <th>Total</th>
                     <th>Status</th>
@@ -25,8 +27,12 @@ else
             <tbody>
                 @foreach (var booking in Model)
                 {
+                    var origin = booking.LegInstance?.FlightLeg?.Route?.Origin?.Abbreviation ?? "—";
+                    var dest = booking.LegInstance?.FlightLeg?.Route?.Destination?.Abbreviation ?? "—";
                     <tr>
                         <td><code>@booking.ConfirmationCode</code></td>
+                        <td><strong>@origin &rarr; @dest</strong></td>
+                        <td>@(booking.LegInstance?.DepartureDateTime.ToString("dd MMM yyyy HH:mm") ?? "—")</td>
                         <td>@booking.DateOfBooking.ToString("dd MMM yyyy")</td>
                         <td>Row @booking.Row, Seat @booking.SeatNumber</td>
                         <td>@booking.TotalPrice.ToString("C")</td>

@@ -1,21 +1,44 @@
 @model BalkanAir.Domain.Entities.Booking
 @{
     ViewData["Title"] = "Booking Confirmed";
+    var origin = Model.LegInstance?.FlightLeg?.Route?.Origin;
+    var dest = Model.LegInstance?.FlightLeg?.Route?.Destination;
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <div class="card shadow-sm border-success">
             <div class="card-header bg-success text-white text-center">
-                <h4 class="mb-0">Booking Confirmed</h4>
+                <h4 class="mb-0">Booking Confirmed!</h4>
             </div>
-            <div class="card-body text-center">
-                <p class="display-6 fw-bold text-success">@Model.ConfirmationCode</p>
-                <p class="text-muted">Keep this confirmation code for your records.</p>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <p class="display-5 fw-bold text-success mb-1">@Model.ConfirmationCode</p>
+                    <p class="text-muted">Keep this confirmation code for your records.</p>
+                </div>
                 <hr />
-                <p><strong>Date:</strong> @Model.DateOfBooking.ToString("dd MMM yyyy")</p>
-                <p><strong>Seat:</strong> Row @Model.Row, Seat @Model.SeatNumber</p>
-                <p><strong>Total:</strong> @Model.TotalPrice.ToString("C")</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">Flight</h6>
+                        @if (origin is not null && dest is not null)
+                        {
+                            <p><strong>@origin.Abbreviation &rarr; @dest.Abbreviation</strong></p>
+                            <p class="text-muted">@origin.Name &rarr; @dest.Name</p>
+                        }
+                        @if (Model.LegInstance is not null)
+                        {
+                            <p><strong>Departure:</strong> @Model.LegInstance.DepartureDateTime.ToString("dd MMM yyyy HH:mm")</p>
+                            <p><strong>Arrival:</strong> @Model.LegInstance.ArrivalDateTime.ToString("dd MMM yyyy HH:mm")</p>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">Booking</h6>
+                        <p><strong>Date:</strong> @Model.DateOfBooking.ToString("dd MMM yyyy")</p>
+                        <p><strong>Seat:</strong> Row @Model.Row, Seat @Model.SeatNumber</p>
+                        <p><strong>Status:</strong> <span class="badge bg-success">@Model.Status</span></p>
+                        <p><strong>Total:</strong> <span class="fs-5 fw-bold text-success">@Model.TotalPrice.ToString("C")</span></p>
+                    </div>
+                </div>
             </div>
             <div class="card-footer text-center">
                 <a asp-action="MyBookings" class="btn btn-primary">View My Bookings</a>

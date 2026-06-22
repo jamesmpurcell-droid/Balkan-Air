@@ -419,6 +419,73 @@ public class AdministrationController(
         return RedirectToAction("News");
     }
 
+    // ── Aircraft CRUD ──────────────────────────────────────────
+
+    [HttpGet]
+    public async Task<IActionResult> CreateAircraft()
+    {
+        await PopulateManufacturersDropdown();
+        return View(new AircraftFormViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateAircraft(AircraftFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateManufacturersDropdown();
+            return View(model);
+        }
+
+        await aircrafts.AddAsync(new Aircraft
+        {
+            Model = model.AircraftModel,
+            AircraftManufacturerId = model.ManufacturerId,
+            TotalSeats = model.TotalSeats
+        });
+
+        TempData["Success"] = $"Aircraft '{model.AircraftModel}' created.";
+        return RedirectToAction("Aircraft");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditAircraft(int id)
+    {
+        var entity = await aircrafts.GetByIdAsync(id);
+        if (entity is null) return NotFound();
+
+        await PopulateManufacturersDropdown();
+        return View(new AircraftFormViewModel
+        {
+            Id = entity.Id,
+            AircraftModel = entity.Model,
+            ManufacturerId = entity.AircraftManufacturerId,
+            TotalSeats = entity.TotalSeats
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditAircraft(AircraftFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateManufacturersDropdown();
+            return View(model);
+        }
+
+        await aircrafts.UpdateAsync(model.Id, a =>
+        {
+            a.Model = model.AircraftModel;
+            a.AircraftManufacturerId = model.ManufacturerId;
+            a.TotalSeats = model.TotalSeats;
+        });
+
+        TempData["Success"] = $"Aircraft '{model.AircraftModel}' updated.";
+        return RedirectToAction("Aircraft");
+    }
+
     // ── Dropdown helpers ────────────────────────────────────────
 
     private async Task PopulateCountriesDropdown()
@@ -439,6 +506,13 @@ public class AdministrationController(
     {
         ViewBag.Categories = new SelectList(
             await categories.GetAll().Where(c => !c.IsDeleted).ToListAsync(),
+            "Id", "Name");
+    }
+
+    private async Task PopulateManufacturersDropdown()
+    {
+        ViewBag.Manufacturers = new SelectList(
+            await manufacturers.GetAll().Where(m => !m.IsDeleted).OrderBy(m => m.Name).ToListAsync(),
             "Id", "Name");
     }
 }

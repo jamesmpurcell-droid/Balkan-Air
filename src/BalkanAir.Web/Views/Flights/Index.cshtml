@@ -1,10 +1,13 @@
 @model IEnumerable<BalkanAir.Domain.Entities.LegInstance>
 @{
     ViewData["Title"] = "Flights";
+    var currentPage = (int)ViewBag.CurrentPage;
+    var totalPages = (int)ViewBag.TotalPages;
+    var totalFlights = (int)ViewBag.TotalFlights;
 }
 
 <h2>Available Flights</h2>
-<p class="text-muted">Browse upcoming and past flights.</p>
+<p class="text-muted">Showing @totalFlights flights across our network.</p>
 
 @if (!Model.Any())
 {
@@ -16,9 +19,10 @@ else
         <table class="table table-striped table-hover">
             <thead class="table-primary">
                 <tr>
-                    <th>ID</th>
+                    <th>Route</th>
                     <th>Departure</th>
                     <th>Arrival</th>
+                    <th>Duration</th>
                     <th>Price</th>
                     <th>Status</th>
                     <th></th>
@@ -27,12 +31,17 @@ else
             <tbody>
                 @foreach (var flight in Model)
                 {
+                    var origin = flight.FlightLeg?.Route?.Origin?.Abbreviation ?? "—";
+                    var dest = flight.FlightLeg?.Route?.Destination?.Abbreviation ?? "—";
                     <tr>
-                        <td>@flight.Id</td>
+                        <td><strong>@origin &rarr; @dest</strong></td>
                         <td>@flight.DepartureDateTime.ToString("dd MMM yyyy HH:mm")</td>
                         <td>@flight.ArrivalDateTime.ToString("dd MMM yyyy HH:mm")</td>
+                        <td>@flight.Duration.ToString(@"h\:mm")</td>
                         <td>@flight.Price.ToString("C")</td>
-                        <td>@(flight.FlightStatus?.Name ?? "N/A")</td>
+                        <td>
+                            <span class="badge bg-success">@(flight.FlightStatus?.Name ?? "Available")</span>
+                        </td>
                         <td>
                             <a asp-action="Details" asp-route-id="@flight.Id" class="btn btn-sm btn-outline-primary">Details</a>
                         </td>
@@ -41,4 +50,24 @@ else
             </tbody>
         </table>
     </div>
+
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Flight pagination">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)">&laquo; Previous</a>
+                </li>
+                @for (var i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)">Next &raquo;</a>
+                </li>
+            </ul>
+        </nav>
+    }
 }
