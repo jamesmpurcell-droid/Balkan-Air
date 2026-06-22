@@ -12,6 +12,7 @@ COPY src/BalkanAir.Web/BalkanAir.Web.csproj src/BalkanAir.Web/
 COPY tests/BalkanAir.SmokeTests/BalkanAir.SmokeTests.csproj tests/BalkanAir.SmokeTests/
 COPY tests/BalkanAir.Services.Tests/BalkanAir.Services.Tests.csproj tests/BalkanAir.Services.Tests/
 COPY tests/BalkanAir.Api.IntegrationTests/BalkanAir.Api.IntegrationTests.csproj tests/BalkanAir.Api.IntegrationTests/
+COPY tests/BalkanAir.Web.Tests/BalkanAir.Web.Tests.csproj tests/BalkanAir.Web.Tests/
 RUN dotnet restore BalkanAir.sln
 
 COPY . .
