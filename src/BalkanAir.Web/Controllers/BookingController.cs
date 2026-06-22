@@ -93,17 +93,38 @@ public class BookingController(
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Flight = await legInstances.GetByIdAsync(model.LegInstanceId);
+            var flight = await legInstances.GetAll()
+                .Where(l => l.Id == model.LegInstanceId)
+                .Include(l => l.FlightLeg!)
+                    .ThenInclude(fl => fl.Route!)
+                        .ThenInclude(r => r.Origin!)
+                .Include(l => l.FlightLeg!)
+                    .ThenInclude(fl => fl.Route!)
+                        .ThenInclude(r => r.Destination!)
+                .FirstOrDefaultAsync();
+
+            ViewBag.Flight = flight;
             ViewBag.TravelClasses = new SelectList(
                 await travelClasses.GetAll().Where(t => !t.IsDeleted).ToListAsync(),
                 "Id", "Type");
+
+            var validationFare = flight?.FlightLeg?.RouteId is int valRouteId
+                ? await fares.GetAll().FirstOrDefaultAsync(f => f.RouteId == valRouteId && !f.IsDeleted)
+                : null;
+            ViewBag.FarePrice = validationFare?.Price ?? flight?.Price ?? 0m;
+
             return View(model);
         }
 
         var user = await userManager.GetUserAsync(User);
         if (user is null) return Challenge();
 
-        var legInstance = await legInstances.GetByIdAsync(model.LegInstanceId);
+        var legInstance = await legInstances.GetAll()
+            .Where(l => l.Id == model.LegInstanceId)
+            .Include(l => l.FlightLeg!)
+                .ThenInclude(fl => fl.Route!)
+            .FirstOrDefaultAsync();
+
         var routeId = legInstance?.FlightLeg?.RouteId;
         var fare = routeId is not null
             ? await fares.GetAll().FirstOrDefaultAsync(f => f.RouteId == routeId && !f.IsDeleted)
@@ -115,7 +136,7 @@ public class BookingController(
             DateOfBooking = DateTime.UtcNow,
             Row = model.Row,
             SeatNumber = model.SeatNumber,
-            TotalPrice = fare?.Price ?? 0m,
+            TotalPrice = fare?.Price ?? legInstance?.Price ?? 0m,
             TravelClassId = model.TravelClassId,
             Status = BookingStatus.Confirmed,
             UserId = user.Id,
