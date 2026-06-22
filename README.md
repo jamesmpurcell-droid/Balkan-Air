@@ -9,15 +9,16 @@
 src/
   BalkanAir.Common      → Shared constants, error messages, user roles
   BalkanAir.Domain      → 20 entities + 6 enums (clean POCOs, no EF dependencies)
-  BalkanAir.Data        → EF Core 8 DbContext + IdentityDbContext, 20 fluent entity configurations
+  BalkanAir.Data        → EF Core 8 DbContext + IdentityDbContext, 20 fluent configurations, migrations, seed data
   BalkanAir.Services    → 21 async service implementations (generic CRUD + specialised)
   BalkanAir.Api         → ASP.NET Core Web API (12 controllers, Swagger/OpenAPI, Serilog, OpenTelemetry)
-  BalkanAir.Web         → ASP.NET Core MVC (Bootstrap 5, Razor views, Identity auth)
+  BalkanAir.Web         → ASP.NET Core MVC (Bootstrap 5, Razor views, Identity auth, admin CRUD)
 
 tests/
   BalkanAir.SmokeTests               → Toolchain smoke test
   BalkanAir.Services.Tests           → 13 xUnit tests (EF Core InMemory)
   BalkanAir.Api.IntegrationTests     → 11 WebApplicationFactory integration tests
+  BalkanAir.Web.Tests                → 13 Web integration tests (auth, pages, routing)
 ```
 
 ## Build & Test
@@ -25,13 +26,14 @@ tests/
 ```bash
 # Requires .NET 8 SDK (pinned in global.json)
 dotnet build BalkanAir.sln
-dotnet test  BalkanAir.sln          # 25 tests total
+dotnet test  BalkanAir.sln          # 38 tests total
 ```
 
 ## Run with Docker
 
 ```bash
-docker compose up -d                 # SQL Server 2022 + API on port 8080
+docker compose up -d                 # SQL Server 2022 + API (8080) + Web (5000)
+open http://localhost:5000            # Web UI (auto-migrates + seeds data)
 open http://localhost:8080/swagger    # Swagger UI
 ```
 
@@ -40,7 +42,8 @@ open http://localhost:8080/swagger    # Swagger UI
 - **Flight booking flow** — search, select flight, confirm, view bookings
 - **User authentication** — ASP.NET Core Identity (register, login, logout)
 - **User profiles** — edit name, phone, DOB, nationality, address
-- **Administration dashboard** — role-based access, 15 entity management views, soft-delete
+- **Administration dashboard** — role-based access, 15 entity management views, CRUD forms, soft-delete
+- **Seed data** — 10 countries, 12 airports, 12 routes, 84 flight instances, news articles
 - **REST API** — 12 controllers with full CRUD, Swagger/OpenAPI documentation
 - **Structured logging** — Serilog with console sink, request logging
 - **Distributed tracing** — OpenTelemetry with ASP.NET Core + HttpClient instrumentation
@@ -59,7 +62,7 @@ open http://localhost:8080/swagger    # Swagger UI
 | Windows-only IIS | Cross-platform, containerised (Docker) |
 | OWIN + ASP.NET Identity 2 | ASP.NET Core Identity |
 | No structured logging | Serilog + OpenTelemetry |
-| No integration tests | WebApplicationFactory + InMemory DB |
+| No integration tests | WebApplicationFactory + InMemory DB (38 tests) |
 
 ## CI
 

@@ -65,6 +65,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    await SeedData.InitializeAsync(scope.ServiceProvider);
+}
+
 app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())

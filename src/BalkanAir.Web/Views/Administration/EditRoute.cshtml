@@ -1,0 +1,44 @@
+@model BalkanAir.Web.Models.Admin.RouteFormViewModel
+@{ ViewData["Title"] = "Edit Route"; }
+
+<h2>Edit Route</h2>
+<a asp-action="Routes" class="btn btn-outline-secondary btn-sm mb-3">Back to Routes</a>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="EditRoute" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="OriginId" class="form-label"></label>
+                <select asp-for="OriginId" asp-items="ViewBag.Airports" class="form-select">
+                    <option value="">-- Select Origin --</option>
+                </select>
+                <span asp-validation-for="OriginId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="DestinationId" class="form-label"></label>
+                <select asp-for="DestinationId" asp-items="ViewBag.Airports" class="form-select">
+                    <option value="">-- Select Destination --</option>
+                </select>
+                <span asp-validation-for="DestinationId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="DistanceInKm" class="form-label"></label>
+                <input asp-for="DistanceInKm" class="form-control" type="number" step="0.1" />
+                <span asp-validation-for="DistanceInKm" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="FarePrice" class="form-label"></label>
+                <div class="input-group">
+                    <span class="input-group-text">&euro;</span>
+                    <input asp-for="FarePrice" class="form-control" type="number" step="0.01" />
+                </div>
+                <span asp-validation-for="FarePrice" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

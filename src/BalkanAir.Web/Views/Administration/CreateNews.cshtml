@@ -1,0 +1,33 @@
+@model BalkanAir.Web.Models.Admin.NewsFormViewModel
+@{ ViewData["Title"] = "Create News Article"; }
+
+<h2>Create News Article</h2>
+<a asp-action="News" class="btn btn-outline-secondary btn-sm mb-3">Back to News</a>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="CreateNews" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CategoryId" class="form-label"></label>
+                <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
+                    <option value="">-- Select Category --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Content" class="form-label"></label>
+                <textarea asp-for="Content" class="form-control" rows="8"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Publish</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,33 @@
+@model BalkanAir.Web.Models.Admin.AirportFormViewModel
+@{ ViewData["Title"] = "Create Airport"; }
+
+<h2>Create Airport</h2>
+<a asp-action="Airports" class="btn btn-outline-secondary btn-sm mb-3">Back to Airports</a>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CreateAirport" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" placeholder="e.g. London Heathrow" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Abbreviation" class="form-label"></label>
+                <input asp-for="Abbreviation" class="form-control" placeholder="e.g. LHR" />
+                <span asp-validation-for="Abbreviation" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CountryId" class="form-label"></label>
+                <select asp-for="CountryId" asp-items="ViewBag.Countries" class="form-select">
+                    <option value="">-- Select Country --</option>
+                </select>
+                <span asp-validation-for="CountryId" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

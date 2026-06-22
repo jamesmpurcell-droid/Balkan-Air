@@ -50,6 +50,11 @@ try
 
     var app = builder.Build();
 
+    using (var scope = app.Services.CreateScope())
+    {
+        await SeedData.InitializeAsync(scope.ServiceProvider);
+    }
+
     app.UseSerilogRequestLogging();
 
     if (!app.Environment.IsDevelopment())
@@ -78,3 +83,5 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+public partial class Program;
