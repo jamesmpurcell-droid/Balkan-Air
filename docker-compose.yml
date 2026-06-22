@@ -18,10 +18,26 @@ services:
       start_period: 30s
 
   api:
-    build: .
+    build:
+      context: .
+      target: api
     container_name: balkanair-api
     ports:
       - "8080:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=BalkanAir;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Your_strong_Pass123};TrustServerCertificate=True"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      target: web
+    container_name: balkanair-web
+    ports:
+      - "5000:8080"
     environment:
       ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=BalkanAir;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Your_strong_Pass123};TrustServerCertificate=True"
       ASPNETCORE_ENVIRONMENT: "Development"
