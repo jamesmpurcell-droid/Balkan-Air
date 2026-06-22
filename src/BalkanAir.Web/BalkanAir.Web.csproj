@@ -5,4 +5,8 @@
     <ProjectReference Include="..\BalkanAir.Services\BalkanAir.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+  </ItemGroup>
+
 </Project>

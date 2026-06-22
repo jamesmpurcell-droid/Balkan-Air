@@ -23,10 +23,6 @@ internal sealed class BookingConfiguration : IEntityTypeConfiguration<Booking>
 
         builder.Property(b => b.TotalPrice).HasColumnType("decimal(18,2)");
 
-        builder.HasOne(b => b.User)
-            .WithMany()
-            .HasForeignKey(b => b.UserId);
-
         builder.HasOne(b => b.LegInstance)
             .WithMany(l => l.Bookings)
             .HasForeignKey(b => b.LegInstanceId);

@@ -8,7 +8,7 @@ public class Comment
     public bool IsDeleted { get; set; }
 
     public string? UserId { get; set; }
-    public User? User { get; set; }
+    public ApplicationUser? User { get; set; }
 
     public int NewsId { get; set; }
     public News? News { get; set; }

@@ -17,8 +17,5 @@ internal sealed class CreditCardConfiguration : IEntityTypeConfiguration<CreditC
             .IsRequired()
             .HasMaxLength(ValidationConstants.CvvLength);
 
-        builder.HasOne(c => c.User)
-            .WithMany(u => u.CreditCards)
-            .HasForeignKey(c => c.UserId);
     }
 }

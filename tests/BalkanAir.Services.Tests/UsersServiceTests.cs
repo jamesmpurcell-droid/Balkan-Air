@@ -4,10 +4,11 @@ using BalkanAir.Domain.Entities;
 
 public class UsersServiceTests
 {
-    private static User MakeUser(string id = "u1") => new()
+    private static ApplicationUser MakeUser(string id = "u1") => new()
     {
         Id = id,
-        Email = "test@balkanair.com"
+        Email = "test@balkanair.com",
+        UserName = "test@balkanair.com"
     };
 
     [Fact]
@@ -52,7 +53,7 @@ public class UsersServiceTests
     }
 
     [Fact]
-    public async Task SetLastLoginAsync_ShouldUpdateUserSettings()
+    public async Task SetLastLoginAsync_ShouldUpdateLastLogin()
     {
         using var db = TestDbContextFactory.Create();
         db.Users.Add(MakeUser());
@@ -64,6 +65,6 @@ public class UsersServiceTests
 
         var user = await db.Users.FindAsync("u1");
         Assert.NotNull(user);
-        Assert.Equal(loginTime, user.UserSettings.LastLogin);
+        Assert.Equal(loginTime, user.LastLogin);
     }
 }

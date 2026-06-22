@@ -1,0 +1,54 @@
+@model BalkanAir.Web.Models.BookingConfirmViewModel
+@{
+    ViewData["Title"] = "Confirm Booking";
+}
+
+<h2>Confirm Your Booking</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Flight Details</h5>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.Flight is BalkanAir.Domain.Entities.LegInstance flight)
+                {
+                    <p><strong>Departure:</strong> @flight.DepartureDateTime.ToString("dd MMM yyyy HH:mm")</p>
+                    <p><strong>Arrival:</strong> @flight.ArrivalDateTime.ToString("dd MMM yyyy HH:mm")</p>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Booking Details</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Confirm" method="post">
+                    <input type="hidden" asp-for="LegInstanceId" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="TravelClassId" class="form-label">Travel Class</label>
+                        <select asp-for="TravelClassId" asp-items="@(ViewBag.TravelClasses as SelectList)" class="form-select"></select>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="Row" class="form-label"></label>
+                            <input asp-for="Row" class="form-control" type="number" min="1" max="99" />
+                        </div>
+                        <div class="col">
+                            <label asp-for="SeatNumber" class="form-label"></label>
+                            <input asp-for="SeatNumber" class="form-control" maxlength="1" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Confirm Booking</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

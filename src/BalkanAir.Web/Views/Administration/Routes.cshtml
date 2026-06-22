@@ -1,0 +1,25 @@
+@model IEnumerable<BalkanAir.Domain.Entities.Route>
+@{ ViewData["Title"] = "Manage Routes"; }
+
+<h2>Routes Management</h2>
+<a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3">Back to Dashboard</a>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr><th>ID</th><th>Origin</th><th>Destination</th><th>Distance (km)</th><th>Deleted</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(item.IsDeleted ? "table-danger" : "")">
+                    <td>@item.Id</td>
+                    <td>@item.Origin?.Name (@item.Origin?.Abbreviation)</td>
+                    <td>@item.Destination?.Name (@item.Destination?.Abbreviation)</td>
+                    <td>@item.DistanceInKm.ToString("N0")</td>
+                    <td>@item.IsDeleted</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

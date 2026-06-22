@@ -1,9 +1,10 @@
 namespace BalkanAir.Data;
 
 using BalkanAir.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-public class BalkanAirDbContext : DbContext
+public class BalkanAirDbContext : IdentityDbContext<ApplicationUser>
 {
     public BalkanAirDbContext(DbContextOptions<BalkanAirDbContext> options)
         : base(options)
@@ -29,7 +30,7 @@ public class BalkanAirDbContext : DbContext
     public DbSet<Route> Routes => Set<Route>();
     public DbSet<Seat> Seats => Set<Seat>();
     public DbSet<TravelClass> TravelClasses => Set<TravelClass>();
-    public DbSet<User> Users => Set<User>();
+    public new DbSet<ApplicationUser> Users => Set<ApplicationUser>();
     public DbSet<UserNotification> UserNotifications => Set<UserNotification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
