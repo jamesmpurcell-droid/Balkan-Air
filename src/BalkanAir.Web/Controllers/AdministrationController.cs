@@ -3,9 +3,11 @@ namespace BalkanAir.Web.Controllers;
 using BalkanAir.Common;
 using BalkanAir.Domain.Entities;
 using BalkanAir.Services.Contracts;
+using BalkanAir.Web.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 [Authorize(Roles = UserRoles.Administrator)]
@@ -144,5 +146,299 @@ public class AdministrationController(
 
         TempData["Success"] = "Roles seeded successfully.";
         return RedirectToAction("Index");
+    }
+
+    // ── Country CRUD ────────────────────────────────────────────
+
+    [HttpGet]
+    public IActionResult CreateCountry() => View(new CountryFormViewModel());
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateCountry(CountryFormViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        await countries.AddAsync(new Country
+        {
+            Name = model.Name,
+            Abbreviation = model.Abbreviation
+        });
+
+        TempData["Success"] = $"Country '{model.Name}' created.";
+        return RedirectToAction("Countries");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditCountry(int id)
+    {
+        var entity = await countries.GetByIdAsync(id);
+        if (entity is null) return NotFound();
+
+        return View(new CountryFormViewModel
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Abbreviation = entity.Abbreviation
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditCountry(CountryFormViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        await countries.UpdateAsync(model.Id, c =>
+        {
+            c.Name = model.Name;
+            c.Abbreviation = model.Abbreviation;
+        });
+
+        TempData["Success"] = $"Country '{model.Name}' updated.";
+        return RedirectToAction("Countries");
+    }
+
+    // ── Airport CRUD ────────────────────────────────────────────
+
+    [HttpGet]
+    public async Task<IActionResult> CreateAirport()
+    {
+        await PopulateCountriesDropdown();
+        return View(new AirportFormViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateAirport(AirportFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateCountriesDropdown();
+            return View(model);
+        }
+
+        await airports.AddAsync(new Airport
+        {
+            Name = model.Name,
+            Abbreviation = model.Abbreviation,
+            CountryId = model.CountryId
+        });
+
+        TempData["Success"] = $"Airport '{model.Name}' created.";
+        return RedirectToAction("Airports");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditAirport(int id)
+    {
+        var entity = await airports.GetByIdAsync(id);
+        if (entity is null) return NotFound();
+
+        await PopulateCountriesDropdown();
+        return View(new AirportFormViewModel
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Abbreviation = entity.Abbreviation,
+            CountryId = entity.CountryId
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditAirport(AirportFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateCountriesDropdown();
+            return View(model);
+        }
+
+        await airports.UpdateAsync(model.Id, a =>
+        {
+            a.Name = model.Name;
+            a.Abbreviation = model.Abbreviation;
+            a.CountryId = model.CountryId;
+        });
+
+        TempData["Success"] = $"Airport '{model.Name}' updated.";
+        return RedirectToAction("Airports");
+    }
+
+    // ── Route CRUD ──────────────────────────────────────────────
+
+    [HttpGet]
+    public async Task<IActionResult> CreateRoute()
+    {
+        await PopulateAirportsDropdown();
+        return View(new RouteFormViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateRoute(RouteFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateAirportsDropdown();
+            return View(model);
+        }
+
+        var route = new Route
+        {
+            OriginId = model.OriginId,
+            DestinationId = model.DestinationId,
+            DistanceInKm = model.DistanceInKm
+        };
+        var routeId = await routes.AddAsync(route);
+
+        if (model.FarePrice > 0)
+        {
+            await fares.AddAsync(new Fare { RouteId = routeId, Price = model.FarePrice });
+        }
+
+        TempData["Success"] = "Route created.";
+        return RedirectToAction("Routes");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditRoute(int id)
+    {
+        var entity = await routes.GetByIdAsync(id);
+        if (entity is null) return NotFound();
+
+        var fare = await fares.GetAll().FirstOrDefaultAsync(f => f.RouteId == id && !f.IsDeleted);
+        await PopulateAirportsDropdown();
+        return View(new RouteFormViewModel
+        {
+            Id = entity.Id,
+            OriginId = entity.OriginId,
+            DestinationId = entity.DestinationId,
+            DistanceInKm = entity.DistanceInKm,
+            FarePrice = fare?.Price ?? 0m
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditRoute(RouteFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateAirportsDropdown();
+            return View(model);
+        }
+
+        await routes.UpdateAsync(model.Id, r =>
+        {
+            r.OriginId = model.OriginId;
+            r.DestinationId = model.DestinationId;
+            r.DistanceInKm = model.DistanceInKm;
+        });
+
+        var fare = await fares.GetAll().FirstOrDefaultAsync(f => f.RouteId == model.Id && !f.IsDeleted);
+        if (fare is not null)
+        {
+            await fares.UpdateAsync(fare.Id, f => f.Price = model.FarePrice);
+        }
+        else if (model.FarePrice > 0)
+        {
+            await fares.AddAsync(new Fare { RouteId = model.Id, Price = model.FarePrice });
+        }
+
+        TempData["Success"] = "Route updated.";
+        return RedirectToAction("Routes");
+    }
+
+    // ── News CRUD ───────────────────────────────────────────────
+
+    [HttpGet]
+    public async Task<IActionResult> CreateNews()
+    {
+        await PopulateCategoriesDropdown();
+        return View(new NewsFormViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateNews(NewsFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateCategoriesDropdown();
+            return View(model);
+        }
+
+        await news.AddAsync(new News
+        {
+            Title = model.Title,
+            Content = model.Content,
+            CategoryId = model.CategoryId,
+            DateCreated = DateTime.UtcNow
+        });
+
+        TempData["Success"] = $"News article '{model.Title}' created.";
+        return RedirectToAction("News");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditNews(int id)
+    {
+        var entity = await news.GetByIdAsync(id);
+        if (entity is null) return NotFound();
+
+        await PopulateCategoriesDropdown();
+        return View(new NewsFormViewModel
+        {
+            Id = entity.Id,
+            Title = entity.Title,
+            Content = entity.Content,
+            CategoryId = entity.CategoryId
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditNews(NewsFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateCategoriesDropdown();
+            return View(model);
+        }
+
+        await news.UpdateAsync(model.Id, n =>
+        {
+            n.Title = model.Title;
+            n.Content = model.Content;
+            n.CategoryId = model.CategoryId;
+        });
+
+        TempData["Success"] = $"News article '{model.Title}' updated.";
+        return RedirectToAction("News");
+    }
+
+    // ── Dropdown helpers ────────────────────────────────────────
+
+    private async Task PopulateCountriesDropdown()
+    {
+        ViewBag.Countries = new SelectList(
+            await countries.GetAll().Where(c => !c.IsDeleted).OrderBy(c => c.Name).ToListAsync(),
+            "Id", "Name");
+    }
+
+    private async Task PopulateAirportsDropdown()
+    {
+        ViewBag.Airports = new SelectList(
+            await airports.GetAll().Where(a => !a.IsDeleted).OrderBy(a => a.Name).ToListAsync(),
+            "Id", "Name");
+    }
+
+    private async Task PopulateCategoriesDropdown()
+    {
+        ViewBag.Categories = new SelectList(
+            await categories.GetAll().Where(c => !c.IsDeleted).ToListAsync(),
+            "Id", "Name");
     }
 }
