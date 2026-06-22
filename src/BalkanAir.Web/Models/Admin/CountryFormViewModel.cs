@@ -9,6 +9,7 @@ public class CountryFormViewModel
     [Required, StringLength(100)]
     public string Name { get; set; } = string.Empty;
 
-    [Required, StringLength(5, MinimumLength = 2)]
+    [Required, StringLength(2, MinimumLength = 2)]
+    [Display(Name = "ISO Code (2 chars)")]
     public string Abbreviation { get; set; } = string.Empty;
 }

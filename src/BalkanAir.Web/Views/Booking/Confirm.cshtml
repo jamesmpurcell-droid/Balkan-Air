@@ -14,8 +14,30 @@
             <div class="card-body">
                 @if (ViewBag.Flight is BalkanAir.Domain.Entities.LegInstance flight)
                 {
-                    <p><strong>Departure:</strong> @flight.DepartureDateTime.ToString("dd MMM yyyy HH:mm")</p>
-                    <p><strong>Arrival:</strong> @flight.ArrivalDateTime.ToString("dd MMM yyyy HH:mm")</p>
+                    var origin = flight.FlightLeg?.Route?.Origin;
+                    var dest = flight.FlightLeg?.Route?.Destination;
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Route</dt>
+                        <dd class="col-sm-8"><strong>@(origin?.Abbreviation ?? "—") &rarr; @(dest?.Abbreviation ?? "—")</strong></dd>
+
+                        <dt class="col-sm-4">From</dt>
+                        <dd class="col-sm-8">@(origin?.Name ?? "Unknown")</dd>
+
+                        <dt class="col-sm-4">To</dt>
+                        <dd class="col-sm-8">@(dest?.Name ?? "Unknown")</dd>
+
+                        <dt class="col-sm-4">Departure</dt>
+                        <dd class="col-sm-8">@flight.DepartureDateTime.ToString("dd MMM yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-4">Arrival</dt>
+                        <dd class="col-sm-8">@flight.ArrivalDateTime.ToString("dd MMM yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-4">Duration</dt>
+                        <dd class="col-sm-8">@flight.Duration.ToString(@"h\h\ mm\m")</dd>
+
+                        <dt class="col-sm-4">Price</dt>
+                        <dd class="col-sm-8"><strong class="text-success">@(((decimal)ViewBag.FarePrice).ToString("C"))</strong></dd>
+                    </dl>
                 }
             </div>
         </div>
@@ -42,7 +64,7 @@
                         </div>
                         <div class="col">
                             <label asp-for="SeatNumber" class="form-label"></label>
-                            <input asp-for="SeatNumber" class="form-control" maxlength="1" />
+                            <input asp-for="SeatNumber" class="form-control" maxlength="1" placeholder="A-F" />
                         </div>
                     </div>
 

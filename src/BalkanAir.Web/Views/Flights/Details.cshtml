@@ -1,29 +1,79 @@
 @model BalkanAir.Domain.Entities.LegInstance
 @{
-    ViewData["Title"] = $"Flight #{Model.Id}";
+    var origin = Model.FlightLeg?.Route?.Origin;
+    var dest = Model.FlightLeg?.Route?.Destination;
+    var routeLabel = $"{origin?.Abbreviation ?? "—"} → {dest?.Abbreviation ?? "—"}";
+    ViewData["Title"] = $"Flight {routeLabel}";
 }
 
 <h2>Flight Details</h2>
 
-<div class="card">
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Flight ID</dt>
-            <dd class="col-sm-9">@Model.Id</dd>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Route Information</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Route</dt>
+                    <dd class="col-sm-8"><strong>@routeLabel</strong></dd>
 
-            <dt class="col-sm-3">Departure</dt>
-            <dd class="col-sm-9">@Model.DepartureDateTime.ToString("dd MMM yyyy HH:mm")</dd>
+                    <dt class="col-sm-4">From</dt>
+                    <dd class="col-sm-8">@(origin?.Name ?? "Unknown")</dd>
 
-            <dt class="col-sm-3">Arrival</dt>
-            <dd class="col-sm-9">@Model.ArrivalDateTime.ToString("dd MMM yyyy HH:mm")</dd>
+                    <dt class="col-sm-4">To</dt>
+                    <dd class="col-sm-8">@(dest?.Name ?? "Unknown")</dd>
 
-            <dt class="col-sm-3">Duration</dt>
-            <dd class="col-sm-9">@Model.Duration</dd>
+                    <dt class="col-sm-4">Distance</dt>
+                    <dd class="col-sm-8">@(Model.FlightLeg?.Route?.DistanceInKm.ToString("N0") ?? "—") km</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Schedule &amp; Pricing</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Departure</dt>
+                    <dd class="col-sm-8">@Model.DepartureDateTime.ToString("dd MMM yyyy HH:mm")</dd>
 
-            <dt class="col-sm-3">Price</dt>
-            <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
-        </dl>
+                    <dt class="col-sm-4">Arrival</dt>
+                    <dd class="col-sm-8">@Model.ArrivalDateTime.ToString("dd MMM yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-4">Duration</dt>
+                    <dd class="col-sm-8">@Model.Duration.ToString(@"h\h\ mm\m")</dd>
+
+                    <dt class="col-sm-4">Price</dt>
+                    <dd class="col-sm-8"><strong>@Model.Price.ToString("C")</strong></dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-success">@(Model.FlightStatus?.Name ?? "Available")</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
     </div>
 </div>
 
-<a asp-action="Index" class="btn btn-secondary mt-3">Back to Flights</a>
+@if (Model.Aircraft is not null)
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Aircraft</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>@(Model.Aircraft.AircraftManufacturer?.Name ?? "") @Model.Aircraft.Model</strong></p>
+            <p class="text-muted mb-0">Total seats: @Model.Aircraft.TotalSeats</p>
+        </div>
+    </div>
+}
+
+<div class="mt-3">
+    <a asp-controller="Booking" asp-action="Confirm" asp-route-legInstanceId="@Model.Id" class="btn btn-success">Book This Flight</a>
+    <a asp-action="Index" class="btn btn-outline-secondary ms-2">Back to Flights</a>
+</div>
