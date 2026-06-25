@@ -2,12 +2,14 @@
 @{ ViewData["Title"] = "Manage Seats"; }
 
 <h2>Seats Management</h2>
-<a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3">Back to Dashboard</a>
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
+</div>
 
 <div class="table-responsive">
     <table class="table table-striped table-hover">
         <thead class="table-dark">
-            <tr><th>ID</th><th>Row</th><th>Number</th><th>Travel Class ID</th><th>Leg Instance</th><th>Deleted</th></tr>
+            <tr><th>ID</th><th>Row</th><th>Number</th><th>Travel Class</th><th>Flight</th><th>Reserved</th><th>Deleted</th></tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
@@ -16,8 +18,9 @@
                     <td>@item.Id</td>
                     <td>@item.Row</td>
                     <td>@item.Number</td>
-                    <td>@item.TravelClassId</td>
-                    <td>@item.LegInstanceId</td>
+                    <td>@(item.TravelClassId)</td>
+                    <td>@(item.LegInstance?.FlightLeg?.Flight?.Number ?? "—")</td>
+                    <td>@(item.IsReserved ? "Yes" : "No")</td>
                     <td>@item.IsDeleted</td>
                 </tr>
             }

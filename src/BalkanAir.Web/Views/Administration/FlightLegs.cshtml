@@ -2,21 +2,25 @@
 @{ ViewData["Title"] = "Manage Flight Legs"; }
 
 <h2>Flight Legs Management</h2>
-<a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3">Back to Dashboard</a>
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
+</div>
 
 <div class="table-responsive">
     <table class="table table-striped table-hover">
         <thead class="table-dark">
-            <tr><th>ID</th><th>Flight</th><th>Departure</th><th>Arrival</th><th>Deleted</th></tr>
+            <tr><th>ID</th><th>Flight</th><th>Route</th><th>Departure</th><th>Arrival</th><th>Instances</th><th>Deleted</th></tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
                 <tr class="@(item.IsDeleted ? "table-danger" : "")">
                     <td>@item.Id</td>
-                    <td>@item.FlightId</td>
+                    <td><strong>@(item.Flight?.Number ?? $"#{item.FlightId}")</strong></td>
+                    <td>@(item.Route?.Origin?.Abbreviation ?? "?") &rarr; @(item.Route?.Destination?.Abbreviation ?? "?")</td>
                     <td>@item.ScheduledDepartureDateTime.ToString("dd MMM yyyy HH:mm")</td>
                     <td>@item.ScheduledArrivalDateTime.ToString("dd MMM yyyy HH:mm")</td>
+                    <td>@item.LegInstances.Count(li => !li.IsDeleted)</td>
                     <td>@item.IsDeleted</td>
                 </tr>
             }

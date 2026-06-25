@@ -1,0 +1,67 @@
+@model BalkanAir.Web.Models.Admin.TravelClassFormViewModel
+@{ ViewData["Title"] = "Create Travel Class"; }
+
+<h2>Create Travel Class</h2>
+<a asp-action="TravelClasses" class="btn btn-outline-secondary btn-sm mb-3">Back to Travel Classes</a>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CreateTravelClass" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Type" class="form-label"></label>
+                <select asp-for="Type" asp-items="Html.GetEnumSelectList<BalkanAir.Domain.Enums.TravelClassType>()" class="form-select"></select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Meal" class="form-label"></label>
+                <input asp-for="Meal" class="form-control" placeholder="e.g. Full meal service" />
+                <span asp-validation-for="Meal" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="AircraftId" class="form-label"></label>
+                <select asp-for="AircraftId" asp-items="@(ViewBag.Aircraft as SelectList)" class="form-select">
+                    <option value="">— Select Aircraft —</option>
+                </select>
+                <span asp-validation-for="AircraftId" class="text-danger"></span>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label asp-for="Price" class="form-label"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input asp-for="Price" class="form-control" step="0.01" />
+                    </div>
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="NumberOfRows" class="form-label"></label>
+                    <input asp-for="NumberOfRows" class="form-control" />
+                    <span asp-validation-for="NumberOfRows" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="NumberOfSeats" class="form-label"></label>
+                    <input asp-for="NumberOfSeats" class="form-control" />
+                    <span asp-validation-for="NumberOfSeats" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="form-check form-check-inline">
+                    <input asp-for="PriorityBoarding" class="form-check-input" />
+                    <label asp-for="PriorityBoarding" class="form-check-label"></label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input asp-for="ReservedSeat" class="form-check-input" />
+                    <label asp-for="ReservedSeat" class="form-check-label"></label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input asp-for="EarnMiles" class="form-check-input" />
+                    <label asp-for="EarnMiles" class="form-check-label"></label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
