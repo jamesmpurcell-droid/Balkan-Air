@@ -13,54 +13,29 @@
 }
 
 <div class="row g-4 mb-4">
-    <div class="col-md-2">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <h3 class="card-title text-primary">@ViewBag.AircraftCount</h3>
-                <p class="card-text">Aircraft</p>
+    @foreach (var (label, count) in new[] {
+        ("Aircraft", (int)ViewBag.AircraftCount),
+        ("Airports", (int)ViewBag.AirportCount),
+        ("Flights", (int)ViewBag.FlightCount),
+        ("Bookings", (int)ViewBag.BookingCount),
+        ("News", (int)ViewBag.NewsCount),
+        ("Users", (int)ViewBag.UserCount),
+        ("Routes", (int)ViewBag.RouteCount),
+        ("Manufacturers", (int)ViewBag.ManufacturerCount),
+        ("Categories", (int)ViewBag.CategoryCount),
+        ("Travel Classes", (int)ViewBag.TravelClassCount),
+        ("Fares", (int)ViewBag.FareCount)
+    })
+    {
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title text-primary">@count</h3>
+                    <p class="card-text">@label</p>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-2">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <h3 class="card-title text-primary">@ViewBag.AirportCount</h3>
-                <p class="card-text">Airports</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <h3 class="card-title text-primary">@ViewBag.FlightCount</h3>
-                <p class="card-text">Flights</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <h3 class="card-title text-primary">@ViewBag.BookingCount</h3>
-                <p class="card-text">Bookings</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <h3 class="card-title text-primary">@ViewBag.NewsCount</h3>
-                <p class="card-text">News</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <h3 class="card-title text-primary">@ViewBag.UserCount</h3>
-                <p class="card-text">Users</p>
-            </div>
-        </div>
-    </div>
+    }
 </div>
 
 <h4>Manage</h4>

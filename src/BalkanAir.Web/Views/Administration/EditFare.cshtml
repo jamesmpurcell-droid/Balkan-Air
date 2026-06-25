@@ -1,0 +1,32 @@
+@model BalkanAir.Web.Models.Admin.FareFormViewModel
+@{ ViewData["Title"] = "Edit Fare"; }
+
+<h2>Edit Fare</h2>
+<a asp-action="Fares" class="btn btn-outline-secondary btn-sm mb-3">Back to Fares</a>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="EditFare" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="RouteId" class="form-label"></label>
+                <select asp-for="RouteId" asp-items="@(ViewBag.Routes as SelectList)" class="form-select">
+                    <option value="">— Select Route —</option>
+                </select>
+                <span asp-validation-for="RouteId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Price" class="form-label"></label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input asp-for="Price" class="form-control" step="0.01" />
+                </div>
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

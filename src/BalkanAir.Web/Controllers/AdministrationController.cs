@@ -29,6 +29,8 @@ public class AdministrationController(
     UserManager<ApplicationUser> userManager,
     RoleManager<IdentityRole> roleManager) : Controller
 {
+    // ── Dashboard ────────────────────────────────────────────────
+
     public async Task<IActionResult> Index()
     {
         ViewBag.AircraftCount = await aircrafts.GetAll().CountAsync();
@@ -37,8 +39,15 @@ public class AdministrationController(
         ViewBag.BookingCount = await bookings.GetAll().CountAsync();
         ViewBag.NewsCount = await news.GetAll().CountAsync();
         ViewBag.UserCount = userManager.Users.Count();
+        ViewBag.RouteCount = await routes.GetAll().CountAsync();
+        ViewBag.ManufacturerCount = await manufacturers.GetAll().CountAsync();
+        ViewBag.CategoryCount = await categories.GetAll().CountAsync();
+        ViewBag.TravelClassCount = await travelClasses.GetAll().CountAsync();
+        ViewBag.FareCount = await fares.GetAll().CountAsync();
         return View();
     }
+
+    // ── List views ───────────────────────────────────────────────
 
     public async Task<IActionResult> Aircraft() =>
         View(await aircrafts.GetAll().Include(a => a.AircraftManufacturer).ToListAsync());
@@ -47,20 +56,45 @@ public class AdministrationController(
         View(await airports.GetAll().Include(a => a.Country).ToListAsync());
 
     public async Task<IActionResult> Flights() =>
-        View(await flights.GetAll().ToListAsync());
+        View(await flights.GetAll().Include(f => f.FlightLegs).ToListAsync());
 
     public async Task<IActionResult> FlightLegs() =>
-        View(await flightLegs.GetAll().Include(fl => fl.Route).ToListAsync());
+        View(await flightLegs.GetAll()
+            .Include(fl => fl.Flight)
+            .Include(fl => fl.Route!)
+                .ThenInclude(r => r.Origin!)
+            .Include(fl => fl.Route!)
+                .ThenInclude(r => r.Destination!)
+            .Include(fl => fl.LegInstances)
+            .ToListAsync());
 
     public async Task<IActionResult> LegInstances() =>
         View(await legInstances.GetAll()
-            .Include(l => l.FlightLeg)
+            .Include(l => l.FlightLeg!)
+                .ThenInclude(fl => fl.Flight!)
+            .Include(l => l.FlightLeg!)
+                .ThenInclude(fl => fl.Route!)
+                    .ThenInclude(r => r.Origin!)
+            .Include(l => l.FlightLeg!)
+                .ThenInclude(fl => fl.Route!)
+                    .ThenInclude(r => r.Destination!)
+            .Include(l => l.Aircraft!)
+                .ThenInclude(a => a.AircraftManufacturer!)
+            .Include(l => l.Bookings)
             .OrderByDescending(l => l.DepartureDateTime)
             .ToListAsync());
 
     public async Task<IActionResult> Bookings() =>
         View(await bookings.GetAll()
-            .Include(b => b.LegInstance)
+            .Include(b => b.User)
+            .Include(b => b.LegInstance!)
+                .ThenInclude(li => li.FlightLeg!)
+                    .ThenInclude(fl => fl.Route!)
+                        .ThenInclude(r => r.Origin!)
+            .Include(b => b.LegInstance!)
+                .ThenInclude(li => li.FlightLeg!)
+                    .ThenInclude(fl => fl.Route!)
+                        .ThenInclude(r => r.Destination!)
             .OrderByDescending(b => b.DateOfBooking)
             .ToListAsync());
 
@@ -74,68 +108,104 @@ public class AdministrationController(
             .ToListAsync());
 
     public async Task<IActionResult> Categories() =>
-        View(await categories.GetAll().ToListAsync());
+        View(await categories.GetAll().Include(c => c.News).ToListAsync());
 
     public async Task<IActionResult> Countries() =>
         View(await countries.GetAll().ToListAsync());
 
     public async Task<IActionResult> TravelClasses() =>
-        View(await travelClasses.GetAll().ToListAsync());
+        View(await travelClasses.GetAll()
+            .Include(tc => tc.Aircraft!)
+                .ThenInclude(a => a.AircraftManufacturer!)
+            .ToListAsync());
 
     public async Task<IActionResult> Fares() =>
-        View(await fares.GetAll().Include(f => f.Route).ToListAsync());
+        View(await fares.GetAll()
+            .Include(f => f.Route!)
+                .ThenInclude(r => r.Origin!)
+            .Include(f => f.Route!)
+                .ThenInclude(r => r.Destination!)
+            .ToListAsync());
 
     public async Task<IActionResult> Seats() =>
-        View(await seats.GetAll().ToListAsync());
+        View(await seats.GetAll()
+            .Include(s => s.LegInstance!)
+                .ThenInclude(li => li.FlightLeg!)
+                    .ThenInclude(fl => fl.Flight!)
+            .ToListAsync());
 
     public async Task<IActionResult> Manufacturers() =>
-        View(await manufacturers.GetAll().ToListAsync());
+        View(await manufacturers.GetAll().Include(m => m.Aircrafts).ToListAsync());
 
     public async Task<IActionResult> Users() =>
         View(await userManager.Users.ToListAsync());
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    // ── Soft-delete actions ──────────────────────────────────────
+
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteAircraft(int id)
     {
         await aircrafts.SoftDeleteAsync(id);
         return RedirectToAction("Aircraft");
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteAirport(int id)
     {
         await airports.SoftDeleteAsync(id);
         return RedirectToAction("Airports");
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteFlight(int id)
     {
         await flights.SoftDeleteAsync(id);
         return RedirectToAction("Flights");
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteBooking(int id)
     {
         await bookings.SoftDeleteAsync(id);
         return RedirectToAction("Bookings");
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteNews(int id)
     {
         await news.SoftDeleteAsync(id);
         return RedirectToAction("News");
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteManufacturer(int id)
+    {
+        await manufacturers.SoftDeleteAsync(id);
+        return RedirectToAction("Manufacturers");
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteCategory(int id)
+    {
+        await categories.SoftDeleteAsync(id);
+        return RedirectToAction("Categories");
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteFare(int id)
+    {
+        await fares.SoftDeleteAsync(id);
+        return RedirectToAction("Fares");
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteTravelClass(int id)
+    {
+        await travelClasses.SoftDeleteAsync(id);
+        return RedirectToAction("TravelClasses");
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> SeedRoles()
     {
         foreach (var role in new[] { UserRoles.Administrator, UserRoles.User })
@@ -153,8 +223,7 @@ public class AdministrationController(
     [HttpGet]
     public IActionResult CreateCountry() => View(new CountryFormViewModel());
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateCountry(CountryFormViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
@@ -183,8 +252,7 @@ public class AdministrationController(
         });
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> EditCountry(CountryFormViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
@@ -208,8 +276,7 @@ public class AdministrationController(
         return View(new AirportFormViewModel());
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateAirport(AirportFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -245,8 +312,7 @@ public class AdministrationController(
         });
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> EditAirport(AirportFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -275,8 +341,7 @@ public class AdministrationController(
         return View(new RouteFormViewModel());
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateRoute(RouteFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -320,8 +385,7 @@ public class AdministrationController(
         });
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> EditRoute(RouteFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -360,8 +424,7 @@ public class AdministrationController(
         return View(new NewsFormViewModel());
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateNews(NewsFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -398,8 +461,7 @@ public class AdministrationController(
         });
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> EditNews(NewsFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -428,8 +490,7 @@ public class AdministrationController(
         return View(new AircraftFormViewModel());
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateAircraft(AircraftFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -465,8 +526,7 @@ public class AdministrationController(
         });
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> EditAircraft(AircraftFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -484,6 +544,271 @@ public class AdministrationController(
 
         TempData["Success"] = $"Aircraft '{model.AircraftModel}' updated.";
         return RedirectToAction("Aircraft");
+    }
+
+    // ── Manufacturer CRUD ───────────────────────────────────────
+
+    [HttpGet]
+    public IActionResult CreateManufacturer() => View(new ManufacturerFormViewModel());
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateManufacturer(ManufacturerFormViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        await manufacturers.AddAsync(new AircraftManufacturer { Name = model.Name });
+
+        TempData["Success"] = $"Manufacturer '{model.Name}' created.";
+        return RedirectToAction("Manufacturers");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditManufacturer(int id)
+    {
+        var entity = await manufacturers.GetByIdAsync(id);
+        if (entity is null) return NotFound();
+
+        return View(new ManufacturerFormViewModel
+        {
+            Id = entity.Id,
+            Name = entity.Name
+        });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditManufacturer(ManufacturerFormViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        await manufacturers.UpdateAsync(model.Id, m => m.Name = model.Name);
+
+        TempData["Success"] = $"Manufacturer '{model.Name}' updated.";
+        return RedirectToAction("Manufacturers");
+    }
+
+    // ── Category CRUD ───────────────────────────────────────────
+
+    [HttpGet]
+    public IActionResult CreateCategory() => View(new CategoryFormViewModel());
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateCategory(CategoryFormViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        await categories.AddAsync(new Category { Name = model.Name });
+
+        TempData["Success"] = $"Category '{model.Name}' created.";
+        return RedirectToAction("Categories");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditCategory(int id)
+    {
+        var entity = await categories.GetByIdAsync(id);
+        if (entity is null) return NotFound();
+
+        return View(new CategoryFormViewModel
+        {
+            Id = entity.Id,
+            Name = entity.Name
+        });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditCategory(CategoryFormViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        await categories.UpdateAsync(model.Id, c => c.Name = model.Name);
+
+        TempData["Success"] = $"Category '{model.Name}' updated.";
+        return RedirectToAction("Categories");
+    }
+
+    // ── Fare CRUD ───────────────────────────────────────────────
+
+    [HttpGet]
+    public async Task<IActionResult> CreateFare()
+    {
+        await PopulateRoutesDropdown();
+        return View(new FareFormViewModel());
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateFare(FareFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateRoutesDropdown();
+            return View(model);
+        }
+
+        await fares.AddAsync(new Fare
+        {
+            RouteId = model.RouteId,
+            Price = model.Price
+        });
+
+        TempData["Success"] = $"Fare created (${model.Price}).";
+        return RedirectToAction("Fares");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditFare(int id)
+    {
+        var entity = await fares.GetByIdAsync(id);
+        if (entity is null) return NotFound();
+
+        await PopulateRoutesDropdown();
+        return View(new FareFormViewModel
+        {
+            Id = entity.Id,
+            RouteId = entity.RouteId,
+            Price = entity.Price
+        });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditFare(FareFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateRoutesDropdown();
+            return View(model);
+        }
+
+        await fares.UpdateAsync(model.Id, f =>
+        {
+            f.RouteId = model.RouteId;
+            f.Price = model.Price;
+        });
+
+        TempData["Success"] = "Fare updated.";
+        return RedirectToAction("Fares");
+    }
+
+    // ── Travel Class CRUD ───────────────────────────────────────
+
+    [HttpGet]
+    public async Task<IActionResult> CreateTravelClass()
+    {
+        await PopulateAircraftDropdown();
+        return View(new TravelClassFormViewModel());
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateTravelClass(TravelClassFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateAircraftDropdown();
+            return View(model);
+        }
+
+        await travelClasses.AddAsync(new TravelClass
+        {
+            Type = model.Type,
+            Meal = model.Meal,
+            PriorityBoarding = model.PriorityBoarding,
+            ReservedSeat = model.ReservedSeat,
+            EarnMiles = model.EarnMiles,
+            NumberOfRows = model.NumberOfRows,
+            NumberOfSeats = model.NumberOfSeats,
+            Price = model.Price,
+            AircraftId = model.AircraftId
+        });
+
+        TempData["Success"] = $"Travel class '{model.Type}' created.";
+        return RedirectToAction("TravelClasses");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditTravelClass(int id)
+    {
+        var entity = await travelClasses.GetByIdAsync(id);
+        if (entity is null) return NotFound();
+
+        await PopulateAircraftDropdown();
+        return View(new TravelClassFormViewModel
+        {
+            Id = entity.Id,
+            Type = entity.Type,
+            Meal = entity.Meal,
+            PriorityBoarding = entity.PriorityBoarding,
+            ReservedSeat = entity.ReservedSeat,
+            EarnMiles = entity.EarnMiles,
+            NumberOfRows = entity.NumberOfRows,
+            NumberOfSeats = entity.NumberOfSeats,
+            Price = entity.Price,
+            AircraftId = entity.AircraftId
+        });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditTravelClass(TravelClassFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateAircraftDropdown();
+            return View(model);
+        }
+
+        await travelClasses.UpdateAsync(model.Id, tc =>
+        {
+            tc.Type = model.Type;
+            tc.Meal = model.Meal;
+            tc.PriorityBoarding = model.PriorityBoarding;
+            tc.ReservedSeat = model.ReservedSeat;
+            tc.EarnMiles = model.EarnMiles;
+            tc.NumberOfRows = model.NumberOfRows;
+            tc.NumberOfSeats = model.NumberOfSeats;
+            tc.Price = model.Price;
+            tc.AircraftId = model.AircraftId;
+        });
+
+        TempData["Success"] = $"Travel class '{model.Type}' updated.";
+        return RedirectToAction("TravelClasses");
+    }
+
+    // ── Flight CRUD ─────────────────────────────────────────────
+
+    [HttpGet]
+    public IActionResult CreateFlight() => View(new FlightFormViewModel());
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateFlight(FlightFormViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        await flights.AddAsync(new Flight { Number = model.Number });
+
+        TempData["Success"] = $"Flight '{model.Number}' created.";
+        return RedirectToAction("Flights");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditFlight(int id)
+    {
+        var entity = await flights.GetByIdAsync(id);
+        if (entity is null) return NotFound();
+
+        return View(new FlightFormViewModel
+        {
+            Id = entity.Id,
+            Number = entity.Number
+        });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditFlight(FlightFormViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        await flights.UpdateAsync(model.Id, f => f.Number = model.Number);
+
+        TempData["Success"] = $"Flight '{model.Number}' updated.";
+        return RedirectToAction("Flights");
     }
 
     // ── Dropdown helpers ────────────────────────────────────────
@@ -514,5 +839,38 @@ public class AdministrationController(
         ViewBag.Manufacturers = new SelectList(
             await manufacturers.GetAll().Where(m => !m.IsDeleted).OrderBy(m => m.Name).ToListAsync(),
             "Id", "Name");
+    }
+
+    private async Task PopulateRoutesDropdown()
+    {
+        var routeList = await routes.GetAll()
+            .Where(r => !r.IsDeleted)
+            .Include(r => r.Origin)
+            .Include(r => r.Destination)
+            .ToListAsync();
+
+        ViewBag.Routes = new SelectList(
+            routeList.Select(r => new
+            {
+                r.Id,
+                Display = $"{r.Origin?.Abbreviation ?? "?"} → {r.Destination?.Abbreviation ?? "?"} ({r.DistanceInKm} km)"
+            }),
+            "Id", "Display");
+    }
+
+    private async Task PopulateAircraftDropdown()
+    {
+        var aircraftList = await aircrafts.GetAll()
+            .Where(a => !a.IsDeleted)
+            .Include(a => a.AircraftManufacturer)
+            .ToListAsync();
+
+        ViewBag.Aircraft = new SelectList(
+            aircraftList.Select(a => new
+            {
+                a.Id,
+                Display = $"{a.AircraftManufacturer?.Name} {a.Model} ({a.TotalSeats} seats)"
+            }),
+            "Id", "Display");
     }
 }
